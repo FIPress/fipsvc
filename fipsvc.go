@@ -1,30 +1,30 @@
 package fipsvc
 
 import (
+	"log"
 	"os"
 	"os/signal"
 	"syscall"
-	"log"
 )
 
 type Hook func()
 
 var (
 	cleanupHooks []Hook
-	reloadHooks []Hook
+	reloadHooks  []Hook
 )
 
 func AddCleanupHooks(hooks ...Hook) {
-	cleanupHooks = append(cleanupHooks,hooks...)
+	cleanupHooks = append(cleanupHooks, hooks...)
 }
 
 func AddReloadHooks(hooks ...Hook) {
-	reloadHooks = append(reloadHooks,hooks...)
+	reloadHooks = append(reloadHooks, hooks...)
 }
 
 func Start() {
 	c := make(chan os.Signal, 1)
-	signal.Notify(c, syscall.SIGINT,syscall.SIGKILL, syscall.SIGTERM)
+	signal.Notify(c, syscall.SIGINT, syscall.SIGKILL, syscall.SIGTERM)
 	go func() {
 		<-c
 		execHooks(cleanupHooks)
@@ -32,10 +32,10 @@ func Start() {
 
 	}()
 
-	r := make(chan os.Signal,1)
-	signal.Notify(r,syscall.SIGHUP)
+	r := make(chan os.Signal, 1)
+	signal.Notify(r, syscall.SIGHUP)
 	go func() {
-		<- r
+		<-r
 		execHooks(reloadHooks)
 		log.Println("Service reloaded")
 	}()
@@ -46,4 +46,3 @@ func execHooks(hooks []Hook) {
 		f()
 	}
 }
-
