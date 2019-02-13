@@ -28,6 +28,7 @@ func Start() {
 	go func() {
 		<-c
 		execHooks(cleanupHooks)
+		log.Println("system terminated, c", c)
 		os.Exit(1)
 
 	}()
